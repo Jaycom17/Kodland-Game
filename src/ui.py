@@ -2,11 +2,10 @@ import pygame
 from .settings import *
 from .utils import dibujar_texto, dibujar_boton, dibujar_boton_medieval
 
-# -- Pantallas (Similares pero con mejor estilo visual) --
 def pantalla_menu(pantalla, mouse_pos, fondo):
+    """Renderiza menú principal con título y botón de inicio."""
     pantalla.blit(fondo, (0, 0))
     
-    # Estandarte o decoración tras el título (Ancho aumentado para evitar que el texto se salga)
     s = pygame.Surface((700, 150), pygame.SRCALPHA)
     pygame.draw.rect(s, (0, 0, 0, 150), s.get_rect(), border_radius=20)
     pantalla.blit(s, (ANCHO//2 - 350, 120))
@@ -17,11 +16,12 @@ def pantalla_menu(pantalla, mouse_pos, fondo):
     return dibujar_boton_medieval(pantalla, "INICIAR BATALLA", ANCHO//2, 400, 300, 70, mouse_pos)
 
 def pantalla_seleccion_arma(pantalla, mouse_pos):
+    """Renderiza pantalla de selección con cartas interactivas de armas y sus estadísticas."""
+    
     pantalla.fill(NEGRO)
     dibujar_texto(pantalla, "ELIGE TU DESTINO", 60, DORADO, ANCHO//2, 50)
     
     botones = []
-    # Aumentar ancho de carta y separación
     ancho_carta = 240
     alto_carta = 400
     sep_cartas = 260
@@ -32,7 +32,6 @@ def pantalla_seleccion_arma(pantalla, mouse_pos):
     
     c_y = ALTO // 2 + 30
     
-    # Fuente para descripciones (cacheada para eficiencia)
     fuente_desc = pygame.font.SysFont("Arial", 18, bold=False)
 
     for i, arma_tipo in enumerate(armas_lista):
@@ -45,16 +44,11 @@ def pantalla_seleccion_arma(pantalla, mouse_pos):
         color_borde = DORADO if es_hover else arma["color"]
         grosor_borde = 4 if es_hover else 2
         
-        # Fondo carta
         pygame.draw.rect(pantalla, (25, 25, 30), rect_carta)
         pygame.draw.rect(pantalla, color_borde, rect_carta, grosor_borde)
         
-        # --- Contenido Interno ---
-        
-        # 1. Título (Tamaño reducido para que quepa "Martillo de Guerra")
         dibujar_texto(pantalla, arma["nombre"], 24, arma["color"], x, rect_carta.top + 40)
         
-        # 2. Área de Imagen
         w_y = rect_carta.top + 120 
         
         if arma_tipo == 'vara':
@@ -71,22 +65,20 @@ def pantalla_seleccion_arma(pantalla, mouse_pos):
              pygame.draw.rect(pantalla, GRIS_PIEDRA, (x-25, w_y-35, 50, 30))
              pygame.draw.rect(pantalla, (150,150,150), (x-25, w_y-35, 50, 30), 2)
 
-        # 3. Separador
         pygame.draw.line(pantalla, (50, 50, 50), (x - 90, rect_carta.top + 190), (x + 90, rect_carta.top + 190), 2)
         
-        # 4. Stats
         stats_y = rect_carta.top + 220
         dibujar_texto(pantalla, f"Velocidad: {arma['velocidad_ataque']}s", 22, BLANCO, x, stats_y)
         dibujar_texto(pantalla, f"Daño: {arma['daño']}", 22, BLANCO, x, stats_y + 30)
         
-        # 5. Descripción con Wrap real (calculando píxeles)
+      
         desc_y = stats_y + 65
         texto_desc = arma["descripcion"]
         
         palabras = texto_desc.split()
         lineas = []
         linea_act = ""
-        ancho_max = ancho_carta - 30 # Margen interno seguro
+        ancho_max = ancho_carta - 30 
         
         for p in palabras:
             test = linea_act + p + " "
@@ -107,7 +99,8 @@ def pantalla_seleccion_arma(pantalla, mouse_pos):
     return botones
 
 def pantalla_juego(pantalla, jugador, enemigos, efectos, oleada, enemigos_totales, fondo):
-    # Dibujar fondo prerenderizado
+    """Renderiza la pantalla de combate: fondo, entidades, efectos y HUD superior."""
+    
     pantalla.blit(fondo, (0, 0))
     
     for efecto in efectos:
@@ -118,7 +111,6 @@ def pantalla_juego(pantalla, jugador, enemigos, efectos, oleada, enemigos_totale
     
     jugador.dibujar(pantalla)
     
-    # UI Superpuesta (Con fondo semitransparente para leer mejor)
     ancho_ui = 300
     alto_ui = 100
     s = pygame.Surface((ancho_ui, alto_ui))
@@ -130,7 +122,7 @@ def pantalla_juego(pantalla, jugador, enemigos, efectos, oleada, enemigos_totale
     dibujar_texto(pantalla, f"Enemigos: {enemigos_totales}", 24, GRIS_ACERO, ANCHO//2, 75)
 
 def pantalla_fin_juego(pantalla, estado, oleada_alcanzada, mouse_pos, fondo):
-    # Fondo decorativo
+    """Muestra pantalla de Victoria o Game Over con oleada alcanzada y botón de reinicio."""
     pantalla.blit(fondo, (0, 0))
 
     if estado == VICTORIA:
@@ -140,7 +132,6 @@ def pantalla_fin_juego(pantalla, estado, oleada_alcanzada, mouse_pos, fondo):
         color_titulo = ROJO_SANGRE
         titulo = "GAME OVER"
 
-    # Overlay semitransparente
     overlay_ancho = 820
     overlay_alto = 220
     s = pygame.Surface((overlay_ancho, overlay_alto), pygame.SRCALPHA)

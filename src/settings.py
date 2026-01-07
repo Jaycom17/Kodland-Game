@@ -1,14 +1,11 @@
 import pygame
 
-# Inicialización mínima para usar colores/constantes si fuera necesario, 
-# aunque generalmente solo definimos tuplas aquí.
-
 # Constantes de pantalla
 ANCHO = 1024
 ALTO = 720
 FPS = 60
 
-# Colores avanzados
+# Colores usados
 NEGRO = (15, 15, 15)
 BLANCO = (240, 240, 240)
 ROJO_SANGRE = (180, 20, 20)
@@ -34,7 +31,7 @@ ARMAS = {
         "nombre": "Vara Arcana",
         "velocidad_ataque": 0.8,
         "daño": 30,
-        "rango": 800, # Todo el mapa prácticamente
+        "rango": 800, # Alcance del proyectil
         "color": AZUL_MAGICO,
         "descripcion": "Dispara proyectiles mágicos a distancia."
     },

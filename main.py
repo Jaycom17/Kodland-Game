@@ -7,7 +7,8 @@ from src.entities import Jugador, generar_enemigos
 from src.ui import pantalla_menu, pantalla_seleccion_arma, pantalla_juego, pantalla_fin_juego
 
 def main():
-    # Inicialización de Pygame
+    """Bucle principal del juego. Controla estados, eventos, spawning y transiciones entre oleadas."""
+    
     pygame.init()
     
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
@@ -17,7 +18,7 @@ def main():
     estado_juego = MENU
     jugador = None
     enemigos = []
-    efectos = [] # Proyectiles y visuales
+    efectos = [] 
     oleada_actual = 1
     enemigos_por_oleada = [15, 20, 30, 40, 50] 
     enemigos_generados = 0
@@ -76,10 +77,9 @@ def main():
             pantalla_seleccion_arma(pantalla, mouse_pos)
             
         elif estado_juego == JUGANDO:
-            # Spawner progresivo para no saturar de golpe
             if enemigos_restantes_spawn > 0:
                 timer_spawn += 1
-                if timer_spawn > 30: # Spawn cada medio segundo aprox
+                if timer_spawn > 30: # Spawn cada medio segundo aproximadamente
                     cantidad = min(random.randint(1, 3), enemigos_restantes_spawn)
                     nuevos = generar_enemigos(cantidad, oleada_actual, ANCHO, ALTO)
                     enemigos.extend(nuevos)
@@ -124,17 +124,15 @@ def main():
                     estado_juego = VICTORIA
                 else:
                     enemigos_restantes_spawn = enemigos_por_oleada[oleada_actual - 1]
-                    # Aumentar dificultad arma
                     if jugador:
                         jugador.velocidad_ataque = max(0.2, jugador.velocidad_ataque - 0.15)
-                        # Restaurar al héroe antes de la siguiente oleada
+                        # Restaurar la vida antes de la siguiente oleada
                         jugador.vida = jugador.vida_maxima
 
             if jugador and jugador.vida <= 0:
                 oleada_alcanzada = oleada_actual
                 estado_juego = GAME_OVER
             
-            # Solo dibujamos el juego si seguimos jugando, si cambiamos a game over, se dibujará en el siguiente frame en el bloque correcto
             if estado_juego == JUGANDO and jugador:
                 pantalla_juego(pantalla, jugador, enemigos, efectos, oleada_actual, enemigos_restantes_spawn + len(enemigos), fondo_juego)
         

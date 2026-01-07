@@ -4,9 +4,9 @@ import math
 from .settings import *
 
 def generar_fondo_pasto(ancho, alto):
+    """Genera fondo de campo de batalla con gradiente, textura de ruido y manchas de tierra."""
     superficie = pygame.Surface((ancho, alto))
 
-    # 1. Gradiente base: Verde oscuro y profundo, sobrio
     color_top = (30, 50, 25)      # Verde bosque muy oscuro
     color_bottom = (45, 75, 35)   # Verde oliva oscuro
     
@@ -17,7 +17,6 @@ def generar_fondo_pasto(ancho, alto):
         b = int(color_top[2] + (color_bottom[2] - color_top[2]) * factor)
         pygame.draw.line(superficie, (r, g, b), (0, y), (ancho, y))
 
-    # 2. Textura sutil (ruido suave) para romper la uniformidad
     for _ in range(800):
         cx = random.randint(0, ancho - 1)
         cy = random.randint(0, alto - 1)
@@ -36,7 +35,7 @@ def generar_fondo_pasto(ancho, alto):
         except IndexError:
             pass
 
-    # 3. Zonas de tierra (grandes y difusas, no caminos ruidosos)
+    # Zonas de tierra
     for _ in range(12): 
         cx = random.randint(0, ancho)
         cy = random.randint(0, alto)
@@ -44,26 +43,25 @@ def generar_fondo_pasto(ancho, alto):
         ry = random.randint(60, 150)
         
         s_tierra = pygame.Surface((rx*2, ry*2), pygame.SRCALPHA)
-        # Marrón tierra oscuro, baja opacidad
         color_tierra = (65, 50, 35, 90) 
         pygame.draw.ellipse(s_tierra, color_tierra, (0, 0, rx*2, ry*2))
         superficie.blit(s_tierra, (cx-rx, cy-ry))
-
-    # 4. Detalles muy escasos (pequeños matojos)
+        
+    # Matojos dispersos
     for _ in range(150):
         cx = random.randint(0, ancho)
         cy = random.randint(0, alto)
-        color_matojo = (55, 85, 45) # Un poco más claro que el fondo
+        color_matojo = (55, 85, 45)
         
-        # Pequeño grupo de 3 lineas
         for i in range(-1, 2):
             pygame.draw.line(superficie, color_matojo, (cx, cy), (cx + i*4, cy - 6), 1)
 
     return superficie
 
 def generar_fondo_muro(ancho, alto):
+    """Genera fondo de muro de piedra con patrón de ladrillos para menús."""
     superficie = pygame.Surface((ancho, alto))
-    superficie.fill((30, 30, 35)) # Gris base oscuro
+    superficie.fill((30, 30, 35)) 
     
     # Patrón de ladrillos
     ancho_ladrillo = 60
@@ -72,7 +70,6 @@ def generar_fondo_muro(ancho, alto):
     for y in range(0, alto, alto_ladrillo):
         desplazamiento = 0 if (y // alto_ladrillo) % 2 == 0 else ancho_ladrillo // 2
         for x in range(-30, ancho, ancho_ladrillo):
-            # Variación de color para realismo
             val = random.randint(40, 60)
             color = (val, val, val + 5)
             

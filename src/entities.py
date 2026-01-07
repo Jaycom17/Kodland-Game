@@ -4,6 +4,7 @@ import random
 from .settings import *
 
 class Jugador:
+    """Personaje controlable con vida, movimiento y ataque automático según arma elegida."""
     def __init__(self, x, y, arma_tipo):
         self.x = x
         self.y = y
@@ -16,7 +17,7 @@ class Jugador:
         self.daño = ARMAS[arma_tipo]["daño"]
         self.rango = ARMAS[arma_tipo]["rango"]
         self.tiempo_ultimo_ataque = 0
-        self.direccion_mirada = 0 # Grados
+        self.direccion_mirada = 0
         self.color = BLANCO
         
         # Ajustes visuales según clase
@@ -28,6 +29,7 @@ class Jugador:
             self.color_cuerpo = MARRON_MADERA
 
     def mover(self, teclas, ancho_pantalla, alto_pantalla):
+        """Mueve al jugador con WASD/flechas. Normaliza diagonal y mantiene dentro de límites."""
         dx, dy = 0, 0
         if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
             dx = -self.velocidad
@@ -55,6 +57,7 @@ class Jugador:
             self.direccion_mirada = math.atan2(dy, dx)
     
     def atacar_automatico(self, tiempo_actual, enemigos, efectos):
+        """Sistema de ataque automático. Busca enemigos en rango y dispara/golpea según arma equipada."""
         if tiempo_actual - self.tiempo_ultimo_ataque >= self.velocidad_ataque * 1000:
             atacó = False
             
@@ -69,7 +72,7 @@ class Jugador:
                     atacó = True
 
             elif self.arma == "espada":
-                # Ataque Melee: Busca enemigo más cercano en rango para orientar el tajo
+                # Ataque en rango: Busca enemigo más cercano en rango para orientar el tajo
                 enemigos_en_rango = [e for e in enemigos if math.sqrt((e.x - self.x)**2 + (e.y - self.y)**2) <= self.rango + 50]
                 
                 target_angle = self.direccion_mirada
@@ -78,8 +81,7 @@ class Jugador:
                     target_angle = math.atan2(enemigo_cercano.y - self.y, enemigo_cercano.x - self.x)
                     atacó = True # Ataca si hay enemigos cerca
                 else:
-                    # Si no hay enemigos cerca, no ataca o ataca al aire? 
-                    # Digamos que ataca en la dirección de movimiento para efecto visual
+                    # Si no hay enemigos cerca ataca al aire en la dirección de movimiento para efecto visual
                     atacó = True 
 
                 if atacó:
@@ -94,7 +96,7 @@ class Jugador:
                                 # Comprobar ángulo
                                 ang_enemigo = math.atan2(enemigo.y - self.y, enemigo.x - self.x)
                                 diff = (ang_enemigo - target_angle + math.pi) % (2*math.pi) - math.pi
-                                if abs(diff) < 1.0: # Un cono de ataque de aprox 110 grados
+                                if abs(diff) < 1.0:
                                     enemigo.recibir_daño(self.daño)
                                     # Empuje leve con espada
                                     enemigo.x += math.cos(target_angle) * 10
@@ -108,7 +110,6 @@ class Jugador:
                     efectos.append(golpe)
                     for enemigo in enemigos_en_rango:
                         enemigo.recibir_daño(self.daño)
-                        # Gran empuje
                         angulo_empuje = math.atan2(enemigo.y - self.y, enemigo.x - self.x)
                         enemigo.x += math.cos(angulo_empuje) * 40
                         enemigo.y += math.sin(angulo_empuje) * 40
@@ -123,6 +124,7 @@ class Jugador:
             self.vida = 0
     
     def dibujar(self, pantalla):
+        """Renderiza sprite procedural del jugador con vestimenta, arma y barra de vida."""
         def ajustar_color(color, delta):
             return tuple(max(0, min(255, c + delta)) for c in color)
 
@@ -294,6 +296,7 @@ class Jugador:
         pygame.draw.rect(pantalla, VERDE_CÉSPED, (barra_x, barra_y, vida_ancho, barra_alto))
 
 class Enemigo:
+    """Enemigo hostil con IA de persecución. Tipos: normal, rápido, pesado."""
     def __init__(self, x, y, oleada, tipo="normal"):
         self.x = x
         self.y = y
@@ -358,6 +361,7 @@ class Enemigo:
         return self.vida > 0
     
     def dibujar(self, pantalla):
+        """Dibuja sprite procedural del enemigo con estilo visual según tipo (normal/rápido/pesado)."""
         def ajustar_color(color, delta):
             return tuple(max(0, min(255, c + delta)) for c in color)
 
@@ -558,7 +562,8 @@ class Proyectil:
             pygame.draw.circle(surface, (*self.color, alpha), (self.radio, self.radio), self.radio - i)
             pantalla.blit(surface, (offset_x - self.radio, offset_y - self.radio))
 
-class EfectoTajo:
+class EfectoTajo:    
+    """Efecto visual de tajo en arco para Espada Real. Animación temporal sin colisiones."""    
     def __init__(self, x, y, angulo, alcance, daño):
         self.x = x
         self.y = y
@@ -590,6 +595,7 @@ class EfectoTajo:
         pygame.draw.line(pantalla, BLANCO, (self.x, self.y), (end_x, end_y), 2)
 
 class EfectoGolpeSuelo:
+    """Onda de choque expansiva para Martillo de Guerra. Efecto visual de área."""
     def __init__(self, x, y, radio_max):
         self.x = x
         self.y = y
@@ -616,6 +622,7 @@ class EfectoGolpeSuelo:
         pantalla.blit(surface, (self.x - self.radio_max, self.y - self.radio_max))
 
 def generar_enemigos(cantidad, oleada, ancho_pantalla, alto_pantalla):
+    """Genera enemigos en bordes de pantalla con proporción de tipos según oleada."""
     enemigos = []
     tipos = ["normal", "rapido", "pesado"]
     # Probabilidades según oleada
