@@ -11,10 +11,10 @@
 - [Controles y HUD](#controles-y-hud)
 - [Enemigos y Oleadas](#enemigos-y-oleadas)
 - [Presentación Audiovisual](#presentación-audiovisual)
+- [Características Técnicas Destacadas](#características-técnicas-destacadas)
 - [Arquitectura Técnica](#arquitectura-técnica)
 - [Instalación y Ejecución](#instalación-y-ejecución)
 - [Guía de Desarrollo](#guía-de-desarrollo)
-- [Futuras Mejoras](#futuras-mejoras)
 - [Créditos](#créditos)
 
 ---
@@ -22,7 +22,7 @@
 ## Visión General
 - **Género:** Survival arcade con control top-down.
 - **Motor:** Pygame 2, sin assets externos; todo se dibuja con primitivas.
-- **Duración:** 5 oleadas progressively más difíciles.
+- **Duración:** 5 oleadas progresivamente más difíciles.
 - **Objetivo:** Sobrevivir a cada oleada, recuperando salud y mejorando la cadencia de ataque entre rondas.
 
 ---
@@ -90,6 +90,42 @@ Cada arma define estilo de juego, alcance y efectos de control. La elección se 
 - **Personajes:** Sprites procedurales con sombreado pseudo-volumétrico, capas de ropa y armas dinámicas.
 - **UI:** Estética medieval consistente entre menú, selección, victoria y derrota.
 - **Audio:** `song.mp3` se reproduce en bucle al 50% de volumen como música ambiente durante la partida.
+- **Apoyo creativo:** Herramientas de inteligencia artificial aceleraron la iteración visual de enemigos, protagonista y armamento.
+
+---
+
+## Características Técnicas Destacadas
+
+### 🎨 Renderizado 100% Procedural
+Todo el contenido visual se genera en tiempo real mediante código Python y primitivas de Pygame:
+- **Sin dependencias externas:** No se utilizan imágenes, sprites o tilesets precargados.
+- **Sprites dinámicos:** Personajes y enemigos se construyen capa por capa con efectos de sombreado, permitiendo variaciones sin almacenar múltiples assets.
+- **Escalado suave:** Aplicación de `pygame.transform.smoothscale` para mantener calidad visual en sprites generados proceduralmente.
+
+### ⚡ Optimización de Rendimiento
+- **Superficies estáticas reutilizables:** El fondo del campo de batalla se genera una sola vez al inicio y se reutiliza en cada frame.
+- **Gestión eficiente de entidades:** Sistema de listas para proyectiles y efectos visuales con limpieza automática de objetos fuera de pantalla o completados.
+- **Normalización vectorial:** Movimiento diagonal corregido matemáticamente para evitar velocidades mayores que el desplazamiento en un solo eje.
+
+### 🎮 Sistemas de Combate Avanzados
+- **Targeting inteligente:** El jugador ataca automáticamente al enemigo más cercano dentro del alcance de su arma.
+- **Efectos de empuje (knockback):** Cada tipo de arma aplica fuerzas de retroceso diferenciadas, permitiendo control de multitudes.
+- **Gestión de cooldowns:** Sistema de temporización preciso para la cadencia de ataque, con progresión dinámica entre oleadas.
+
+### 🏗️ Arquitectura Modular y Escalable
+- **Separación clara de responsabilidades:** Lógica de juego, renderizado, UI y configuración distribuidos en módulos independientes.
+- **Configuración centralizada:** Todas las constantes de balance (daño, salud, velocidades) en `settings.py` para ajustes rápidos sin tocar código de lógica.
+- **Sistema de estados:** Máquina de estados limpia (MENU, SELECCION, JUEGO, etc.) que facilita agregar nuevas pantallas o modos.
+
+### 🧪 Física y Colisiones Precisas
+- **Detección por distancia euclidiana:** Cálculo matemático preciso de rangos de ataque y colisiones jugador-enemigo.
+- **Áreas de efecto circulares:** El Martillo de Guerra utiliza geometría circular real para determinar qué enemigos reciben daño.
+- **Proyectiles teledirigidos:** La Vara Arcana implementa seguimiento de objetivo con interpolación suave de rotación.
+
+### 📊 Balance Dinámico
+- **Escalado progresivo:** Cada oleada incrementa el número de enemigos y ajusta las proporciones de tipos (normal/rápido/pesado).
+- **Compensación de dificultad:** La velocidad de ataque del jugador mejora automáticamente tras superar cada oleada.
+- **Restauración estratégica:** Salud completa entre oleadas para mantener un ritmo de juego equilibrado.
 
 ---
 
@@ -145,22 +181,3 @@ python3 main.py
 - **Depuración:** Ejecuta `python -m pygame.docs` para revisar documentación oficial, o añade `print` controlados en el bucle principal para inspeccionar estados.
 - **Música:** Reemplaza `song.mp3` respetando el nombre del archivo para mantener la carga automática.
 
----
-
-## Futuras Mejoras
-1. Añadir habilidades activas con tiempos de recarga para cada clase.
-2. Incorporar potenciadores temporales que caigan de enemigos derrotados.
-3. Implementar marcador de puntuación y estadísticas post-partida.
-4. Ajustar opciones de accesibilidad (volumen, colores alternativos, dificultad).
-5. Añadir soporte para gamepads usando `pygame.joystick`.
-
----
-
-## Créditos
-- Desarrollo, arte procedural y diseño: Equipo del proyecto.
-- Librerías utilizadas: [Pygame](https://www.pygame.org/).
-- Música: `song.mp3` incluida en el repositorio (ajustada al 50% de volumen por defecto).
-
----
-
-**Crónicas Medievales** se desarrolló como práctica de arquitectura de software y construcción de videojuegos con Pygame, priorizando código limpio, reutilizable y libre de dependencias gráficas externas.
